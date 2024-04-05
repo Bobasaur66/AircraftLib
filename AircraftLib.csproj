@@ -87,6 +87,7 @@
     <Compile Include="Config.cs" />
     <Compile Include="DepthMeterPatch.cs" />
     <Compile Include="FlightManager.cs" />
+    <Compile Include="MaxAltitudes.cs" />
     <Compile Include="PlaneEngines.cs" />
     <Compile Include="PlaneVehicle.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

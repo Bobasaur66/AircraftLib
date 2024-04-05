@@ -49,7 +49,7 @@ namespace AircraftLib
             }
         }
 
-        // thank you metious
+        // thank you to metious
         public static float GetNormalizedAngle(float angle)
         {
             angle %= 360;
@@ -84,6 +84,8 @@ namespace AircraftLib
             mv.useRigidbody.velocity = Vector3.ClampMagnitude(mv.useRigidbody.velocity, (mv as PlaneVehicle).maxSpeed);
 
             //ShowHintMessage(mv.useRigidbody.velocity.ToString() + liftFactor.ToString());
+
+            MaxAltitudes.ClampAltitude(mv);
         }
 
         public static void DoHoverFlight(ModVehicle mv)
@@ -97,30 +99,36 @@ namespace AircraftLib
             mv.worldForces.aboveWaterDrag = 0.5f;
 
             mv.worldForces.aboveWaterGravity = 0f;
+
+            mv.useRigidbody.velocity = Vector3.ClampMagnitude(mv.useRigidbody.velocity, (mv as AirshipVehicle).maxSpeed);
+
+            MaxAltitudes.ClampAltitude(mv);
         }
 
-        public static void DoGliderFlight(ModVehicle mv)
-        {
-            if (mv == null)
-            {
-                return;
-            }
-            mv.moveOnLand = true;
+        //public static void DoGliderFlight(ModVehicle mv)
+        //{
+        //    if (mv == null)
+        //    {
+        //        return;
+        //    }
+        //    mv.moveOnLand = true;
 
-            mv.worldForces.aboveWaterDrag = 0.5f;
+        //    mv.worldForces.aboveWaterDrag = 0.5f;
 
-            liftFactor = 0f;
+        //    liftFactor = 0f;
 
-            liftFactor = Mathf.Clamp(Mathf.Abs(mv.useRigidbody.velocity.z), 0, (mv as PlaneVehicle).takeoffSpeed);
+        //    liftFactor = Mathf.Clamp(Mathf.Abs(mv.useRigidbody.velocity.z), 0, (mv as GliderVehicle).takeoffSpeed);
 
-            liftFactor = liftFactor / (mv as PlaneVehicle).takeoffSpeed;
+        //    liftFactor = liftFactor / (mv as GliderVehicle).takeoffSpeed;
 
-            liftFactor = liftFactor / 2;
+        //    liftFactor = liftFactor / 2;
 
-            mv.useRigidbody.AddRelativeForce(Physics.gravity * -1 * liftFactor, ForceMode.Acceleration);
+        //    mv.useRigidbody.AddRelativeForce(Physics.gravity * -1 * liftFactor, ForceMode.Acceleration);
 
-            mv.useRigidbody.velocity = Vector3.ClampMagnitude(mv.useRigidbody.velocity, (mv as PlaneVehicle).maxSpeed);
-        }
+        //    mv.useRigidbody.velocity = Vector3.ClampMagnitude(mv.useRigidbody.velocity, (mv as GliderVehicle).maxSpeed);
+
+        //    MaxAltitudes.ClampAltitude(mv);
+        //}
 
         public static bool checkUnderwaterActual(ModVehicle mv)
         {

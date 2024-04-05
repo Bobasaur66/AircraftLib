@@ -11,13 +11,18 @@ namespace AircraftLib
     {
         public abstract float maxSpeed { get; set; }
 
+        public abstract bool floatInWater { get; set; }
+
         public override void Update()
         {
             base.Update();
 
             FlightManager.DoHoverFlight(this);
 
-            this.worldForces.underwaterGravity = -5f;
+            if (floatInWater)
+            {
+                this.worldForces.underwaterGravity = -5f;
+            }
         }
 
     }
