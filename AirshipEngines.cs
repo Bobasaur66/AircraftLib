@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace AircraftLib
 {
-    public class AirshipRCEngine : RCAirshipEngine
+    public class StarshipRCEngine : RCAirshipEngine
     {
         protected override float FORWARD_TOP_SPEED => 2000f;
 

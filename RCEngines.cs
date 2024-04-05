@@ -135,48 +135,84 @@ namespace AircraftLib
             // if underwater
             if (FlightManager.checkUnderwaterActual(this.mv) == true)
             {
-                // stabilize roll
-                AircraftLib.FlightManager.StabilizeRoll(this.mv, true);
+                // reset mouse crosshair aim thingy
+                mousePosition = new Vector2(0f, 0f);
+                isControllingRC = false;
+                canvasClone.SetActive(false);
 
-                // do yaw with mouse horizontalness
-                this.rb.AddTorque(this.mv.transform.up * Time.deltaTime * yawSensitivity * mousePosition.x / 30, (ForceMode)2);
-
-                // pitch
-                this.rb.AddTorque(this.mv.transform.right * Time.deltaTime * pitchSensitivity * mousePosition.y / 30, (ForceMode)2);
+                SeamothControlRotation();
             }
             else
             {
+                // enable crosshair thing
+                isControllingRC = true;
+                canvasClone.SetActive(true);
+
+                // input
+                inputYawValue = 0f;
+                if (GameInput.GetKey(AircraftLibPlugin.ModConfig.yawLeftBind))
+                {
+                    inputYawValue += 1f;
+                }
+                if (GameInput.GetKey(AircraftLibPlugin.ModConfig.yawRightBind))
+                {
+                    inputYawValue -= 1f;
+                }
+
+                //ALLogger.Hint(inputYawValue.ToString(), 2f);
+
                 // pitch
-                this.rb.AddTorque(this.mv.transform.right * Time.deltaTime * pitchSensitivity * GetCurrentPercentOfVehicleTopSpeed() * mousePosition.y / 18, (ForceMode)2);
+                this.rb.AddTorque(this.mv.transform.right * Time.deltaTime * pitchSensitivity * mousePosition.y / 18, (ForceMode)2);
 
                 // destablize roll
                 AircraftLib.FlightManager.StabilizeRoll(this.mv, false);
 
                 // do roll with mouse horizontalness
-                this.rb.AddTorque(this.mv.transform.forward * Time.deltaTime * rollSensitivity * GetCurrentPercentOfVehicleTopSpeed() * mousePosition.x / 18, (ForceMode)2);
+                this.rb.AddTorque(this.mv.transform.forward * Time.deltaTime * rollSensitivity * mousePosition.x / 18, (ForceMode)2);
 
                 // do yaw with bank angle
                 rollAngle = this.mv.transform.localEulerAngles.z;
                 rollAngle = FlightManager.GetNormalizedAngle(rollAngle);
                 rollDirection = rollAngle / Mathf.Abs(rollAngle);
 
+                // thank you to metious for this
                 if (Mathf.Abs(rollAngle) > 90)
                 {
-                    // thank you metious
                     yawValue = Mathf.Lerp(1f, 0f,
                     Mathf.InverseLerp(90 * rollDirection, 180 * rollDirection, rollAngle)
                     );
                 }
                 else
                 {
-                    // thank you metious
                     yawValue = Mathf.Lerp(0f, 1f,
                     Mathf.InverseLerp(0 * rollDirection, 90 * rollDirection, rollAngle)
                     );
                 }
 
-                this.rb.AddTorque(Vector3.up * Time.deltaTime * yawSensitivity * GetCurrentPercentOfVehicleTopSpeed() * yawValue * rollDirection * -3, (ForceMode)2);
+                if (inputYawValue != 0f)
+                {
+                    this.rb.AddTorque(Vector3.up * Time.deltaTime * yawSensitivity * inputYawValue * -3, (ForceMode)2);
+                }
+                else
+                {
+                    this.rb.AddTorque(Vector3.up * Time.deltaTime * yawSensitivity * yawValue * rollDirection * -3, (ForceMode)2);
+                }
             }
+        }
+
+        public void SeamothControlRotation()
+        {
+            // stabilize roll
+            FlightManager.StabilizeRoll(this.mv, true);
+
+            // normal seamoth kinda rotation (from vehicle framework)
+            float pitchFactor = 5f;
+            float yawFactor = 5f;
+            Vector2 mouseDir = GameInput.GetLookDelta();
+            float xRot = mouseDir.x;
+            float yRot = mouseDir.y;
+            rb.AddTorque(mv.transform.up * xRot * yawFactor * Time.deltaTime, ForceMode.VelocityChange);
+            rb.AddTorque(mv.transform.right * yRot * -pitchFactor * Time.deltaTime, ForceMode.VelocityChange);
         }
 
         public override void ControlRotation()

@@ -1,6 +1,7 @@
 ﻿using BepInEx;
 using BepInEx.Logging;
 using HarmonyLib;
+using Nautilus.Handlers;
 using UnityEngine;
 
 namespace AircraftLib
@@ -12,10 +13,12 @@ namespace AircraftLib
     {
         private const string MyGUID = "com.Bobasaur.AircraftLib";
         private const string PluginName = "AircraftLib";
-        private const string VersionString = "1.0.0";
+        private const string VersionString = "1.2.0";
 
         private static readonly Harmony Harmony = new Harmony(MyGUID);
         public static ManualLogSource Log = new ManualLogSource(PluginName);
+
+        public static Config ModConfig { get; } = OptionsPanelHandler.RegisterModOptions<Config>();
 
         private void Awake()
         {

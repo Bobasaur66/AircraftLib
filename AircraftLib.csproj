@@ -83,6 +83,8 @@
     <Compile Include="AircraftLibPlugin.cs" />
     <Compile Include="AirshipEngines.cs" />
     <Compile Include="AirshipVehicle.cs" />
+    <Compile Include="ALLogger.cs" />
+    <Compile Include="Config.cs" />
     <Compile Include="DepthMeterPatch.cs" />
     <Compile Include="FlightManager.cs" />
     <Compile Include="PlaneEngines.cs" />
