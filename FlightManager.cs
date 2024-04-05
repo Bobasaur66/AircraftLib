@@ -85,7 +85,7 @@ namespace AircraftLib
 
             //ShowHintMessage(mv.useRigidbody.velocity.ToString() + liftFactor.ToString());
 
-            MaxAltitudes.ClampAltitude(mv);
+            ClampAltitude(mv);
         }
 
         public static void DoHoverFlight(ModVehicle mv)
@@ -102,7 +102,7 @@ namespace AircraftLib
 
             mv.useRigidbody.velocity = Vector3.ClampMagnitude(mv.useRigidbody.velocity, (mv as AirshipVehicle).maxSpeed);
 
-            MaxAltitudes.ClampAltitude(mv);
+            ClampAltitude(mv);
         }
 
         //public static void DoGliderFlight(ModVehicle mv)
@@ -127,7 +127,7 @@ namespace AircraftLib
 
         //    mv.useRigidbody.velocity = Vector3.ClampMagnitude(mv.useRigidbody.velocity, (mv as GliderVehicle).maxSpeed);
 
-        //    MaxAltitudes.ClampAltitude(mv);
+        //    ClampAltitude(mv);
         //}
 
         public static bool checkUnderwaterActual(ModVehicle mv)
@@ -140,6 +140,25 @@ namespace AircraftLib
             {
                 return false;
             }
+        }
+
+        // maximum altitudes
+        public static float baseMaxAlt = 1000f;
+
+        public static float oneMaxAlt = 2000f;
+
+        public static float twoMaxAlt = 3000f;
+
+        public static float threeMaxAlt = 4000f;
+
+        public static float fourMaxAlt = 6000f;
+
+        public static float fiveMaxAlt = 10000f;
+
+
+        public static void ClampAltitude(ModVehicle mv)
+        {
+            return;
         }
     }
 }
