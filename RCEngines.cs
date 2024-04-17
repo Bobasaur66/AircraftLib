@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using UnityEngine;
 using VehicleFramework.Engines;
 using VehicleFramework;
+using VehicleFramework.VehicleTypes;
 
 namespace AircraftLib
 {
@@ -94,6 +95,86 @@ namespace AircraftLib
             float num2 = moveDirection.x + moveDirection.y + moveDirection.z;
             float num3 = Mathf.Pow(0.85f, (float)this.mv.numEfficiencyModules);
             this.mv.GetComponent<PowerManager>().TrySpendEnergy(num * num2 * num3 * Time.deltaTime);
+        }
+
+        public virtual void ApplyAircraftDrag(Vector3 move)
+        {
+            if (mv.GetIsUnderwater())
+            {
+                ApplyDrag(move);
+            }
+            else
+            {
+                // edited from vehicle framework code
+                if (move.z == 0)
+                {
+                    if (1 < Mathf.Abs(ForwardMomentum))
+                    {
+                        ForwardMomentum -= DragDecay / 50 * ForwardMomentum * Time.deltaTime;
+                    }
+                }
+                if (move.x == 0)
+                {
+                    if (1 < Mathf.Abs(RightMomentum))
+                    {
+                        RightMomentum -= DragDecay / 50 * RightMomentum * Time.deltaTime;
+                    }
+                }
+                if (move.y == 0)
+                {
+                    if (1 < Mathf.Abs(UpMomentum))
+                    {
+                        UpMomentum -= DragDecay / 50 * UpMomentum * Time.deltaTime;
+                    }
+                }
+            }
+        }
+
+        public override void FixedUpdate()
+        {
+            // edited from vehicle framework code
+            Vector3 DoMoveAction()
+            {
+                Vector3 innerMoveDirection = GameInput.GetMoveDirection();
+                ApplyPlayerControls(innerMoveDirection);
+                DrainPower(innerMoveDirection);
+                return innerMoveDirection;
+            }
+            Vector3 moveDirection = Vector3.zero;
+            if (mv.GetIsUnderwater() || CanMoveAboveWater)
+            {
+                if (mv.CanPilot() && mv.IsPlayerDry)
+                {
+                    if (mv as Submarine != null)
+                    {
+                        if ((mv as Submarine).IsPlayerPiloting())
+                        {
+                            moveDirection = DoMoveAction();
+                        }
+                    }
+                    else
+                    {
+                        moveDirection = DoMoveAction();
+                    }
+                }
+                if (moveDirection == Vector3.zero)
+                {
+                    UpdateEngineHum(-3);
+                }
+                else
+                {
+                    UpdateEngineHum(moveDirection.magnitude);
+                }
+                PlayEngineHum();
+                PlayEngineWhistle(moveDirection);
+
+                ExecutePhysicsMove();
+            }
+            else
+            {
+                UpdateEngineHum(-3);
+            }
+            ApplyAircraftDrag(moveDirection);
         }
     }
 

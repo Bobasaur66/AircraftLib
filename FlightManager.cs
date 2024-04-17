@@ -39,7 +39,7 @@ namespace AircraftLib
                 return;
             }
 
-            if (checkUnderwaterActual(mv) == true)
+            if (mv.GetIsUnderwater())
             {
                 mv.gameObject.FindChild("LandingGear").gameObject.SetActive(false);
             }
@@ -75,17 +75,26 @@ namespace AircraftLib
 
             liftFactor = 0f;
 
-            liftFactor = Mathf.Clamp(Mathf.Abs(mv.useRigidbody.velocity.z), 0, (mv as PlaneVehicle).takeoffSpeed);
+            if (mv.gameObject.transform.position.y > GetMaxAltitude(mv))
+            {
+                mv.useRigidbody.AddForce(Physics.gravity);
 
-            liftFactor = liftFactor / (mv as PlaneVehicle).takeoffSpeed;
 
-            mv.useRigidbody.AddRelativeForce(Physics.gravity * -1 * liftFactor, ForceMode.Acceleration);
+            }
+            else
+            {
+                
+
+                liftFactor = Mathf.Clamp(Mathf.Abs(mv.useRigidbody.velocity.z), 0, (mv as PlaneVehicle).takeoffSpeed);
+
+                liftFactor = liftFactor / (mv as PlaneVehicle).takeoffSpeed;
+
+                mv.useRigidbody.AddRelativeForce(Physics.gravity * -1 * liftFactor, ForceMode.Acceleration);
+            }
 
             mv.useRigidbody.velocity = Vector3.ClampMagnitude(mv.useRigidbody.velocity, (mv as PlaneVehicle).maxSpeed);
 
             //ShowHintMessage(mv.useRigidbody.velocity.ToString() + liftFactor.ToString());
-
-            ClampAltitude(mv);
         }
 
         public static void DoHoverFlight(ModVehicle mv)
@@ -98,37 +107,19 @@ namespace AircraftLib
 
             mv.worldForces.aboveWaterDrag = 0.5f;
 
-            mv.worldForces.aboveWaterGravity = 0f;
+            if (mv.gameObject.transform.position.y > GetMaxAltitude(mv))
+            {
+                mv.worldForces.aboveWaterGravity = 9.81f;
+            }
+            else
+            {
+                mv.worldForces.aboveWaterGravity = 0f;
+            }
 
             mv.useRigidbody.velocity = Vector3.ClampMagnitude(mv.useRigidbody.velocity, (mv as AirshipVehicle).maxSpeed);
-
-            ClampAltitude(mv);
         }
 
-        //public static void DoGliderFlight(ModVehicle mv)
-        //{
-        //    if (mv == null)
-        //    {
-        //        return;
-        //    }
-        //    mv.moveOnLand = true;
 
-        //    mv.worldForces.aboveWaterDrag = 0.5f;
-
-        //    liftFactor = 0f;
-
-        //    liftFactor = Mathf.Clamp(Mathf.Abs(mv.useRigidbody.velocity.z), 0, (mv as GliderVehicle).takeoffSpeed);
-
-        //    liftFactor = liftFactor / (mv as GliderVehicle).takeoffSpeed;
-
-        //    liftFactor = liftFactor / 2;
-
-        //    mv.useRigidbody.AddRelativeForce(Physics.gravity * -1 * liftFactor, ForceMode.Acceleration);
-
-        //    mv.useRigidbody.velocity = Vector3.ClampMagnitude(mv.useRigidbody.velocity, (mv as GliderVehicle).maxSpeed);
-
-        //    ClampAltitude(mv);
-        //}
 
         public static bool checkUnderwaterActual(ModVehicle mv)
         {
@@ -142,23 +133,11 @@ namespace AircraftLib
             }
         }
 
-        // maximum altitudes
-        public static float baseMaxAlt = 1000f;
-
-        public static float oneMaxAlt = 2000f;
-
-        public static float twoMaxAlt = 3000f;
-
-        public static float threeMaxAlt = 4000f;
-
-        public static float fourMaxAlt = 6000f;
-
-        public static float fiveMaxAlt = 10000f;
-
-
-        public static void ClampAltitude(ModVehicle mv)
+        public static float GetMaxAltitude(ModVehicle mv)
         {
-            return;
+            float currentMVMaxAlt = 1000f;
+
+            return currentMVMaxAlt;
         }
     }
 }
