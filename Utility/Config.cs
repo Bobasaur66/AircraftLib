@@ -3,7 +3,7 @@ using Nautilus.Options.Attributes;
 using Nautilus.Json;
 using UnityEngine;
 
-namespace AircraftLib
+namespace AircraftLib.Utility
 {
     [Menu("Aircraftlib Configuration")]
     public class Config : ConfigFile
@@ -13,5 +13,11 @@ namespace AircraftLib
 
         [Keybind("Yaw Right")]
         public KeyCode yawRightBind = KeyCode.D;
+
+        [Toggle("Invert pitch")]
+        public bool invertPitch = false;
+
+        [Toggle("Invert pitch when submerged")]
+        public bool invertPitchSubmerged = false;
     }
 }

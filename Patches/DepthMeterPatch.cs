@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace AircraftLib
+namespace AircraftLib.Patches
 {
     [HarmonyPatch(typeof(Ocean), nameof(Ocean.GetDepthOf))]
     public class DepthMeterPatch

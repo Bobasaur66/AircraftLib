@@ -1,4 +1,5 @@
-﻿using Nautilus.Extensions;
+﻿using AircraftLib.Managers;
+using Nautilus.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,7 +9,7 @@ using UnityEngine;
 using VehicleFramework;
 using VehicleFramework.VehicleTypes;
 
-namespace AircraftLib
+namespace AircraftLib.VehicleTypes
 {
     public abstract class PlaneVehicle : Submersible
     {

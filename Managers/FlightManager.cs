@@ -1,4 +1,5 @@
-﻿using Nautilus.Extensions;
+﻿using AircraftLib.VehicleTypes;
+using Nautilus.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,9 +7,10 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 using VehicleFramework;
+using VehicleFramework.Engines;
 using static GameInput;
 
-namespace AircraftLib
+namespace AircraftLib.Managers
 {
     public class FlightManager
     {
@@ -73,24 +75,12 @@ namespace AircraftLib
 
             mv.worldForces.aboveWaterDrag = 0.5f;
 
-            liftFactor = 0f;
+            // set liftFactor between 0 and takeoff speed based on current speed
+            liftFactor = Mathf.Clamp(Mathf.Abs(mv.useRigidbody.velocity.z), 0, (mv as PlaneVehicle).takeoffSpeed);
+            liftFactor /= (mv as PlaneVehicle).takeoffSpeed;
 
-            if (mv.gameObject.transform.position.y > GetMaxAltitude(mv))
-            {
-                mv.useRigidbody.AddForce(Physics.gravity);
-
-
-            }
-            else
-            {
-                
-
-                liftFactor = Mathf.Clamp(Mathf.Abs(mv.useRigidbody.velocity.z), 0, (mv as PlaneVehicle).takeoffSpeed);
-
-                liftFactor = liftFactor / (mv as PlaneVehicle).takeoffSpeed;
-
-                mv.useRigidbody.AddRelativeForce(Physics.gravity * -1 * liftFactor, ForceMode.Acceleration);
-            }
+            // add lift force (gravity x -2 so that max lift is twice gravity)
+            mv.useRigidbody.AddRelativeForce(Physics.gravity * -2 * liftFactor, ForceMode.Acceleration);
 
             mv.useRigidbody.velocity = Vector3.ClampMagnitude(mv.useRigidbody.velocity, (mv as PlaneVehicle).maxSpeed);
 
@@ -109,7 +99,7 @@ namespace AircraftLib
 
             if (mv.gameObject.transform.position.y > GetMaxAltitude(mv))
             {
-                mv.worldForces.aboveWaterGravity = 9.81f;
+                mv.useRigidbody.AddForce(Physics.gravity * 2);
             }
             else
             {

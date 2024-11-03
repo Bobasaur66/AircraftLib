@@ -81,17 +81,17 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AircraftLibPlugin.cs" />
-    <Compile Include="AirshipEngines.cs" />
-    <Compile Include="AirshipVehicle.cs" />
-    <Compile Include="ALLogger.cs" />
-    <Compile Include="Config.cs" />
-    <Compile Include="DepthMeterPatch.cs" />
-    <Compile Include="FlightManager.cs" />
-    <Compile Include="PlaneEngines.cs" />
-    <Compile Include="PlaneVehicle.cs" />
+    <Compile Include="Engines\AirshipEngines.cs" />
+    <Compile Include="VehicleTypes\AirshipVehicle.cs" />
+    <Compile Include="Utility\ALLogger.cs" />
+    <Compile Include="Utility\Config.cs" />
+    <Compile Include="Patches\DepthMeterPatch.cs" />
+    <Compile Include="Managers\FlightManager.cs" />
+    <Compile Include="Engines\PlaneEngines.cs" />
+    <Compile Include="VehicleTypes\PlaneVehicle.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="RCCrosshair.cs" />
-    <Compile Include="RCEngines.cs" />
+    <Compile Include="Managers\RCCrosshair.cs" />
+    <Compile Include="Engines\RCEngines.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

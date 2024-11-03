@@ -7,8 +7,10 @@ using UnityEngine;
 using VehicleFramework.Engines;
 using VehicleFramework;
 using VehicleFramework.VehicleTypes;
+using AircraftLib.Managers;
+using AircraftLib.VehicleTypes;
 
-namespace AircraftLib
+namespace AircraftLib.Engines
 {
     public abstract class RCVehicleEngine : ModVehicleEngine, IPlayerListener
     {
@@ -110,7 +112,7 @@ namespace AircraftLib
                 {
                     if (1 < Mathf.Abs(ForwardMomentum))
                     {
-                        ForwardMomentum -= DragDecay / 50 * ForwardMomentum * Time.deltaTime;
+                        ForwardMomentum -= DragDecay / 100 * ForwardMomentum * Time.deltaTime;
                     }
                 }
                 if (move.x == 0)
@@ -228,13 +230,18 @@ namespace AircraftLib
                 inputYawValue -= 1f;
             }
 
-            //ALLogger.Hint(inputYawValue.ToString(), 2f);
+            // inversion setting
+            int invert = 1;
+            if (AircraftLibPlugin.ModConfig.invertPitch)
+            {
+                invert = -1;
+            }
 
             // pitch
-            this.rb.AddTorque(this.mv.transform.right * Time.deltaTime * pitchSensitivity * mousePosition.y / 18, (ForceMode)2);
+            this.rb.AddTorque(this.mv.transform.right * Time.deltaTime * pitchSensitivity * mousePosition.y / 18 * invert, (ForceMode)2);
 
             // destablize roll
-            AircraftLib.FlightManager.StabilizeRoll(this.mv, false);
+            FlightManager.StabilizeRoll(this.mv, false);
 
             // do roll with mouse horizontalness
             this.rb.AddTorque(this.mv.transform.forward * Time.deltaTime * rollSensitivity * mousePosition.x / 18, (ForceMode)2);
@@ -273,6 +280,13 @@ namespace AircraftLib
             // stabilize roll
             FlightManager.StabilizeRoll(this.mv, true);
 
+            // inversion setting
+            int invert = 1;
+            if (AircraftLibPlugin.ModConfig.invertPitchSubmerged)
+            {
+                invert = -1;
+            }
+
             // normal seamoth kinda rotation (from vehicle framework)
             float pitchFactor = 5f;
             float yawFactor = 5f;
@@ -280,7 +294,7 @@ namespace AircraftLib
             float xRot = mouseDir.x;
             float yRot = mouseDir.y;
             rb.AddTorque(mv.transform.up * xRot * yawFactor * Time.deltaTime, ForceMode.VelocityChange);
-            rb.AddTorque(mv.transform.right * yRot * -pitchFactor * Time.deltaTime, ForceMode.VelocityChange);
+            rb.AddTorque(mv.transform.right * yRot * -pitchFactor * invert * Time.deltaTime, ForceMode.VelocityChange);
         }
 
         public override void ControlRotation()
@@ -334,23 +348,87 @@ namespace AircraftLib
             setRCCrosshairPosition();
 
             // stabilize roll
-            AircraftLib.FlightManager.StabilizeRoll(this.mv, true);
+            FlightManager.StabilizeRoll(this.mv, true);
+
+            // inversion setting
+            int invert = 1;
+            if (AircraftLibPlugin.ModConfig.invertPitch)
+            {
+                invert = -1;
+            }
 
             // yaw
             this.rb.AddTorque(this.mv.transform.up * Time.deltaTime * yawSensitivity * mousePosition.x / 30, (ForceMode)2);
 
             // pitch
-            this.rb.AddTorque(this.mv.transform.right * Time.deltaTime * pitchSensitivity * mousePosition.y / 30, (ForceMode)2);
+            this.rb.AddTorque(this.mv.transform.right * Time.deltaTime * pitchSensitivity * invert * mousePosition.y / 30, (ForceMode)2);
         }
+
+        // turns by this amount on update so zero at start
+        private float turnSpeedX = 0f;
+        private float turnSpeedY = 0f;
+
+        private float turnSpeedMaxX = 2f;
+        private float turnSpeedMaxY = 2f;
+
+        private float turnSpeedAccelX = 4f;
+        private float turnSpeedAccelY = 4f;
+
+        //subtracted from turn speed
+        protected float turnSpeedDamping = 2f;
 
         public void CyclopsControlRotation()
         {
-            return;
+            if (GameInput.GetButtonHeld(GameInput.Button.MoveRight))
+            {
+                turnSpeedX += turnSpeedAccelX * Time.deltaTime;
+            }
+            if (GameInput.GetButtonHeld(GameInput.Button.MoveLeft))
+            {
+                turnSpeedX -= turnSpeedAccelX * Time.deltaTime;
+            }
+            turnSpeedX = Mathf.Clamp(turnSpeedX, -turnSpeedMaxX, turnSpeedMaxX);
+
+            // drag on turn speed
+            if (turnSpeedX > 0)
+            {
+                if (turnSpeedX >= turnSpeedDamping * Time.deltaTime)
+                {
+                    turnSpeedX -= turnSpeedDamping * Time.deltaTime;
+                }
+                else
+                {
+                    turnSpeedX = 0;
+                }
+            }
+            if (turnSpeedX < 0)
+            {
+                if (turnSpeedX <= -turnSpeedDamping * Time.deltaTime)
+                {
+                    turnSpeedX += turnSpeedDamping * Time.deltaTime;
+                }
+                else
+                {
+                    turnSpeedX = 0;
+                }
+            }
+
+            // carry out actual rotation
+            rb.AddTorque(mv.transform.up * turnSpeedX * Time.deltaTime, ForceMode.VelocityChange);
+            
+
         }
 
         public override void ControlRotation()
         {
-            RCControlRotation();
+            if ((mv as AirshipVehicle).cyclopsControls)
+            {
+                CyclopsControlRotation();
+            }
+            else
+            {
+                RCControlRotation();
+            }
         }
     }
 }

@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace AircraftLib
+namespace AircraftLib.Managers
 {
     public class RCCrosshair
     {

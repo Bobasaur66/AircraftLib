@@ -5,23 +5,23 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace AircraftLib
+namespace AircraftLib.Utility
 {
     public class ALLogger
     {
         public static void Log(string message)
         {
-            Debug.Log("[Aircraftlib] " + message);
+            Debug.Log("[Aircraftlib]: " + message);
         }
 
         public static void Warn(string message)
         {
-            Debug.LogWarning("[Aircraftlib] " + message);
+            Debug.LogWarning("[Aircraftlib]: " + message);
         }
 
         public static void Error(string message)
         {
-            Debug.LogError("[Aircraftlib] " + message);
+            Debug.LogError("[Aircraftlib]: " + message);
         }
 
         public static void Hint(string messageToHint, float timeToHint)
